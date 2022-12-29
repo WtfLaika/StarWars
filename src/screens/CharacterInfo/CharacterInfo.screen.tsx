@@ -1,6 +1,6 @@
 import {RouteProp, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import { Text, StyleSheet} from 'react-native';
+import {Text, StyleSheet} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import {apiGetInfoFromUrl} from '../../api/api';
 import FullScreenLoader from '../../components/fullscreenLoader/fullscreenLoader';
@@ -33,37 +33,44 @@ export const CharacterInfoScreen = () => {
     try {
       setLoading(true);
       const homeworld = await apiGetInfoFromUrl(character.homeworld);
-      const starships = character.starships.length
-        ? await Promise.all(
-            character.starships.map(async item => {
-              const starship = await apiGetInfoFromUrl(item);
-              return starship.name;
-            }),
-          )
-        : [];
-      const films = character.films.length
-        ? await Promise.all(
-            character.films.map(async item => {
-              const film = await apiGetInfoFromUrl(item);
-              return film.title;
-            }),
-          )
-        : [];
-      const vehicles = character.vehicles.length
-        ? await Promise.all(
-            character.vehicles.map(async item => {
-              const vehicle = await apiGetInfoFromUrl(item);
-              return vehicle.name;
-            }),
-          )
-        : [];
-      setRestCharacterInfo(s => ({
-        ...s,
-        homeworld: homeworld.name,
-        starships,
-        films,
-        vehicles,
-      }));
+      Promise.all([
+        character.starships.length
+          ? await Promise.all(
+              character.starships.map(async item => {
+                const starship = await apiGetInfoFromUrl(item);
+                return starship.name;
+              }),
+            )
+          : [],
+        character.films.length
+          ? await Promise.all(
+              character.films.map(async item => {
+                const film = await apiGetInfoFromUrl(item);
+                return film.title;
+              }),
+            )
+          : [],
+        character.vehicles.length
+          ? await Promise.all(
+              character.vehicles.map(async item => {
+                const vehicle = await apiGetInfoFromUrl(item);
+                return vehicle.name;
+              }),
+            )
+          : [],
+      ])
+        .then(value =>
+          setRestCharacterInfo(s => ({
+            ...s,
+            homeworld: homeworld.name,
+            starships: value[0],
+            films: value[1],
+            vehicles: value[2],
+          })),
+        )
+        .catch(e => {
+          throw e;
+        });
     } catch (e) {
       console.log('getCharacterInfo', e);
     } finally {
@@ -71,7 +78,7 @@ export const CharacterInfoScreen = () => {
     }
   };
   useEffect(() => {
-    (async () => await getCharacterInfo())();
+    getCharacterInfo();
   }, []);
 
   return (
@@ -88,43 +95,22 @@ export const CharacterInfoScreen = () => {
       <Text style={styles.field}>
         Firms :{' '}
         {restCharacterInfo.films.length
-          ? restCharacterInfo.films.map(
-              (item, index) =>
-                `${item}${
-                  restCharacterInfo.films.length > 1 &&
-                  restCharacterInfo.films.length - 1 > index &&
-                  ','
-                } `,
-            )
+          ? restCharacterInfo.films.map(item => item).join(', ')
           : 'none'}
       </Text>
       <Text style={styles.field}>
         Vehicles :{' '}
         {restCharacterInfo.vehicles.length
-          ? restCharacterInfo.vehicles.map(
-              (item, index) =>
-                `${item}${
-                  restCharacterInfo.vehicles.length > 1 &&
-                  restCharacterInfo.vehicles.length - 1 > index &&
-                  ','
-                } `,
-            )
+          ? restCharacterInfo.vehicles.map(item => item).join(', ')
           : 'none'}
       </Text>
       <Text style={styles.field}>
         Vehicles :{' '}
         {restCharacterInfo.starships.length
-          ? restCharacterInfo.starships.map(
-              (item, index) =>
-                `${item}${
-                  restCharacterInfo.starships.length > 1 &&
-                  restCharacterInfo.starships.length - 1 > index &&
-                  ','
-                } `,
-            )
+          ? restCharacterInfo.starships.map(item => item).join(', ')
           : 'none'}
       </Text>
-      {loading && <FullScreenLoader />}
+      {loading && <FullScreenLoader style={styles.loader} />}
     </ScrollView>
   );
 };
@@ -138,4 +124,9 @@ const styles = StyleSheet.create({
   },
   name: {fontSize: 30, alignSelf: 'center', textAlign: 'center'},
   field: {fontSize: 20, marginTop: 20},
+  loader: {
+    alignSelf: 'center',
+    justifyContent: 'flex-start',
+    marginTop: '75%',
+  },
 });

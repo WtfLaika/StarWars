@@ -1,24 +1,28 @@
 # StarWars
 
-Choose your hero
-
-# StarWars App
-
 The app provides your list of favorite Star Wars characters and info about them.
 
 # Install
 
-Install the node module:
+Install node modules:
 
-    yarn add react-native-markdown-view
+    yarn install
 
-Start App
+install pods:
 
-IOS :
-yarn ios
+    cd ios && pod install
+    
+# Start App
 
-Android :
-yarn android
+   IOS :
+   
+        yarn ios
+
+   Android :
+   
+        yarn android
+
+
 
 # Usage
 

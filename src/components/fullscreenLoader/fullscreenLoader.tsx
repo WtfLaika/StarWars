@@ -1,11 +1,17 @@
-import {StyleSheet, ActivityIndicator, View} from 'react-native';
+import {
+  StyleSheet,
+  ActivityIndicator,
+  View,
+  ViewStyle,
+  StyleProp,
+} from 'react-native';
 import React from 'react';
 import {height, width} from '../../constants/dimensions';
 import {COLORS} from '../../constants/colors';
 
-const FullScreenLoader = () => {
+const FullScreenLoader = ({style}: {style?: StyleProp<ViewStyle>}) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <ActivityIndicator size={'small'} color={COLORS.black} />
     </View>
   );
