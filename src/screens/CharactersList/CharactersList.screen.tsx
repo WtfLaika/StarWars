@@ -17,30 +17,23 @@ import SearchBar from '../../components/searchBar/searchBar.component';
 import {
   Charachter,
   getCharachters,
-  removeFavoriteCharacter,
-  addFavoriteCharacter,
-  increaseFansAmount,
-  decreaseFansAmount,
   resetFans,
+  handleFavoriteCharacters,
 } from '../../redux/character.slice';
-import {useAppDispatch, useAppSelector} from '../../redux/store';
 import {CharacterRow} from '../../components/characterRow/characterRow.component';
 import FullScreenLoader from '../../components/fullscreenLoader/fullscreenLoader';
 import Heart from '../../assets/heart.svg';
 import {apiSearchCharachters} from '../../api/api';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-
-const initialState = {
-  searchValue: '',
-  searchedResult: [],
-  loading: false,
-};
+import {useAppDispatch, useAppSelector} from '../../hooks/hooks';
 
 const ITEM_HEIGHT = 41;
 
 export const CharactersListScreen = () => {
   const dispatch = useAppDispatch();
-  const [state, setState] = useState(initialState);
+  const [isLoading, setLoading] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+  const [searchedResult, setSearchedResult] = useState('');
   const {
     characters,
     hasNextPage,
@@ -50,29 +43,19 @@ export const CharactersListScreen = () => {
     otherFansAmount,
   } = useAppSelector(s => s.character);
 
-  const setLoading = useCallback(
-    (isLoading: boolean) => {
-      setState(s => ({...s, loading: isLoading}));
-    },
-    [state.loading],
-  );
-
-  const getSearchResult = useCallback(
-    debounce(async (value: string) => {
-      if (value) {
-        const results = await apiSearchCharachters(value);
-        setState(s => ({...s, searchedResult: results}));
-      }
-    }, 100),
-    [state.searchedResult],
-  );
+  const getSearchResult = debounce(async (value: string) => {
+    if (value) {
+      const results = await apiSearchCharachters(value);
+      setSearchedResult(results);
+    }
+  }, 400);
 
   const onChangeInputValue = useCallback(
     (value: string) => {
-      setState(s => ({...s, searchValue: value}));
+      setSearchValue(value);
       getSearchResult(value);
     },
-    [state.searchValue, state.searchedResult],
+    [searchValue, searchedResult],
   );
 
   const onScrollBeginDrag = useCallback(() => Keyboard.dismiss(), []);
@@ -88,11 +71,11 @@ export const CharactersListScreen = () => {
   }, []);
 
   const nextPage = useCallback(async () => {
-    if (!hasNextPage || state.loading || !!state.searchValue) {
+    if (!hasNextPage || isLoading || !!searchValue) {
       return;
     }
     dispatch(getCharachters());
-  }, [hasNextPage, state.loading, state.searchValue]);
+  }, [hasNextPage, isLoading, searchValue]);
 
   const onReset = useCallback(() => {
     dispatch(resetFans());
@@ -100,13 +83,7 @@ export const CharactersListScreen = () => {
 
   const likeHandler = useCallback(
     (item: Charachter) => {
-      if (!favoriteCharacters.includes(item.name)) {
-        dispatch(addFavoriteCharacter(item.name));
-        return dispatch(increaseFansAmount(item.gender));
-      }
-      dispatch(removeFavoriteCharacter(item.name));
-
-      dispatch(decreaseFansAmount(item.gender));
+      dispatch(handleFavoriteCharacters(item));
     },
     [favoriteCharacters],
   );
@@ -125,8 +102,7 @@ export const CharactersListScreen = () => {
     />
   );
 
-  const keyExtractor = (item: Charachter, index: number) =>
-    `${item.name}-character-${index}`;
+  const keyExtractor = (item: Charachter) => `${item.url}`;
   const getItemLayout = (data: any, index: number) => ({
     length: ITEM_HEIGHT,
     offset: ITEM_HEIGHT * index,
@@ -152,14 +128,15 @@ export const CharactersListScreen = () => {
     );
   };
 
-  const EmptyComponent = (
-    <View style={styles.emptyComponent}>
-      <Text>No result found</Text>
-    </View>
-  );
+  const EmptyComponent = () =>
+    !isLoading ? (
+      <View style={styles.emptyComponent}>
+        <Text>No result found</Text>
+      </View>
+    ) : null;
 
   const ListFooterComponent = () =>
-    characters.length >= 10 && hasNextPage && !state.searchValue ? (
+    characters.length > 10 && hasNextPage && !searchValue ? (
       <View style={styles.nextPageLoader}>
         <ActivityIndicator />
       </View>
@@ -180,7 +157,7 @@ export const CharactersListScreen = () => {
       </View>
       <View style={styles.searchContainer}>
         <SearchBar
-          value={state.searchValue}
+          value={searchValue}
           onValueChange={onChangeInputValue}
           placeholder={'Search'}
         />
@@ -192,14 +169,14 @@ export const CharactersListScreen = () => {
           ListHeaderComponent={HeaderComponent}
           ListEmptyComponent={EmptyComponent}
           renderItem={renderItem}
-          data={state.searchValue ? state.searchedResult : characters}
+          data={isLoading ? null : searchValue ? searchedResult : characters}
           keyExtractor={keyExtractor}
           contentContainerStyle={styles.listContainer}
           getItemLayout={getItemLayout}
           ListFooterComponent={ListFooterComponent}
         />
       </View>
-      {state.loading && <FullScreenLoader />}
+      {isLoading && <FullScreenLoader />}
     </SafeAreaView>
   );
 };

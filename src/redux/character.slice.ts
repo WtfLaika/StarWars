@@ -1,3 +1,4 @@
+import {Charachter} from './character.slice';
 import {apiGetCharachters} from './../api/api';
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {AppThunk} from './store';
@@ -122,10 +123,27 @@ export const getCharachters =
         dispatch(setHasNextPage(!!res.next));
       }
     } catch (error) {
-      console.log('update Circle Error', error);
+      console.log('update Characters Error', error);
     } finally {
       if (cb) {
-        cb();
+        setTimeout(() => cb(), 1000);
       }
+    }
+  };
+
+export const handleFavoriteCharacters =
+  (charachter: Charachter): AppThunk =>
+  async (dispatch, getState) => {
+    try {
+      const {favoriteCharacters} = getState().character;
+      if (!favoriteCharacters.includes(charachter.name)) {
+        dispatch(addFavoriteCharacter(charachter.name));
+        return dispatch(increaseFansAmount(charachter.gender));
+      }
+      dispatch(removeFavoriteCharacter(charachter.name));
+
+      dispatch(decreaseFansAmount(charachter.gender));
+    } catch (error) {
+      console.log('handle Favorite Characters Error', error);
     }
   };
