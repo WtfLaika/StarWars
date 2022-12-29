@@ -1,59 +1,27 @@
-## [fastlane match](https://docs.fastlane.tools/actions/match/)
+# StarWars
 
-This repository contains all your certificates and provisioning profiles needed to build and sign your applications. They are encrypted using OpenSSL via a passphrase.
+Choose your hero
 
-**Important:** Make sure this repository is set to private and only your team members have access to this repo.
+# StarWars App
 
-Do not modify this file, as it gets overwritten every time you run _match_.
+The app provides your list of favorite Star Wars characters and info about them.
 
-### Installation
+# Install
 
-Make sure you have the latest version of the Xcode command line tools installed:
+Install the node module:
 
-```
-xcode-select --install
-```
+    yarn add react-native-markdown-view
 
-Install _fastlane_ using
+Start App
 
-```
-[sudo] gem install fastlane -NV
-```
+IOS :
+yarn ios
 
-or alternatively using `brew install fastlane`
+Android :
+yarn android
 
-### Usage
+# Usage
 
-Navigate to your project folder and run
-
-```
-fastlane match appstore
-```
-
-```
-fastlane match adhoc
-```
-
-```
-fastlane match development
-```
-
-```
-fastlane match enterprise
-```
-
-For more information open [fastlane match git repo](https://docs.fastlane.tools/actions/match/)
-
-### Content
-
-#### certs
-
-This directory contains all your certificates with their private keys
-
-#### profiles
-
-This directory contains all provisioning profiles
-
----
-
-For more information open [fastlane match git repo](https://docs.fastlane.tools/actions/match/)
+- Click on the Heart Icon to add a character to your favorites list, and a second click to remove the character from the favorites list.
+- Click on character name to see more info
+- Click on the button to flush all the fan statistics to the initial state and clear your favorites list
