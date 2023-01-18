@@ -11,18 +11,16 @@ Install node modules:
 install pods:
 
     cd ios && pod install
-    
+
 # Start App
 
-   IOS :
-   
+IOS :
+
         yarn ios
 
-   Android :
-   
+Android :
+
         yarn android
-
-
 
 # Usage
 
