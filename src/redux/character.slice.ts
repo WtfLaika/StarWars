@@ -1,4 +1,3 @@
-import {Charachter} from './character.slice';
 import {apiGetCharachters} from './../api/api';
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {AppThunk} from './store';
@@ -33,7 +32,7 @@ interface СharacterState {
   likedCharacters?: string[];
 }
 
-const initialState: СharacterState = {
+export const initialState: СharacterState = {
   characters: [],
   favoriteCharacters: [],
   currentPage: 1,
@@ -76,11 +75,11 @@ const character = createSlice({
       }
     },
     decreaseFansAmount: (state, {payload}: PayloadAction<string>) => {
-      if (payload === 'male') {
+      if (payload === 'male' && state.maleFansAmount > 0) {
         state.maleFansAmount = state.maleFansAmount - 1;
-      } else if (payload === 'female') {
+      } else if (payload === 'female' && state.femaleFansAmount > 0) {
         state.femaleFansAmount = state.femaleFansAmount - 1;
-      } else {
+      } else if (typeof payload === 'string' && state.otherFansAmount > 0) {
         state.otherFansAmount = state.otherFansAmount - 1;
       }
     },
