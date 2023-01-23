@@ -8,6 +8,7 @@
  * @format
  */
 
+import {NavigationContainer} from '@react-navigation/native';
 import React from 'react';
 
 import {SafeAreaProvider} from 'react-native-safe-area-context';
@@ -19,7 +20,9 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <Provider store={store}>
-        <MainNavigation />
+        <NavigationContainer>
+          <MainNavigation />
+        </NavigationContainer>
       </Provider>
     </SafeAreaProvider>
   );
