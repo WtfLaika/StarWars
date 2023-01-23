@@ -60,7 +60,7 @@ export const CharactersListScreen = () => {
 
   const onScrollBeginDrag = useCallback(() => Keyboard.dismiss(), []);
 
-  useEffect(() => {
+  const fetchCharacters = useCallback(async () => {
     if (!!characters && characters.length) {
       return;
     }
@@ -68,6 +68,10 @@ export const CharactersListScreen = () => {
     dispatch(
       getCharachters(true, () => setTimeout(() => setLoading(false), 500)),
     );
+  }, [characters, isLoading]);
+
+  useEffect(() => {
+    fetchCharacters();
   }, []);
 
   const nextPage = useCallback(async () => {
